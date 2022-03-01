@@ -4,109 +4,147 @@
   $image_id = $_GET["image_id"];
 
   if($image_id == 0)
-    $ms = 10;
+    $ms = 4;
   if($image_id == 1)
-    $ms = 10;
-  elseif($image_id == 2)
-    $ms = 3;
+    $ms = 4;
+  if($image_id == 2)
+    $ms = 4;
   elseif($image_id == 3)
-    $ms = 7;
-  elseif($image_id == 4)
-    $ms = 7;
-  elseif($image_id == 5)
-    $ms = 2;
-  elseif($image_id == 6)
-    $ms = 6;
-  elseif($image_id == 7)
-    $ms = 10;
-  elseif($image_id == 8)
-    $ms = 5;
-  elseif($image_id == 9)
-    $ms = 10;
-  elseif($image_id == 10)
     $ms = 1;
+  elseif($image_id == 4)
+    $ms = 3;
+  elseif($image_id == 5)
+    $ms = 0;
+  elseif($image_id == 6)
+    $ms = 3;
+  elseif($image_id == 7)
+    $ms = 0;
+  elseif($image_id == 8)
+    $ms = 4;
+  elseif($image_id == 9)
+    $ms = 3;
+  elseif($image_id == 10)
+    $ms = 0;
   elseif($image_id == 11)
     $ms = 1;
   elseif($image_id == 12)
-    $ms = 0;
+    $ms = 2;
   elseif($image_id == 13)
-    $ms = 0;
+    $ms = 3;
   elseif($image_id == 14)
-    $ms = 7;
+    $ms = 0;
   elseif($image_id == 15)
     $ms = 0;
   elseif($image_id == 16)
-    $ms = 7;
-  elseif($image_id == 17)
-    $ms = 8;
-  elseif($image_id == 18)
-    $ms = 7;
-  elseif($image_id == 19)
-    $ms = 1;
-  elseif($image_id == 20)
-    $ms = 6;
-  elseif($image_id == 21)
     $ms = 2;
+  elseif($image_id == 17)
+    $ms = 2;
+  elseif($image_id == 18)
+    $ms = 0;
+  elseif($image_id == 19)
+    $ms = 0;
+  elseif($image_id == 20)
+    $ms = 0;
+  elseif($image_id == 21)
+    $ms = 3;
   elseif($image_id == 22)
-    $ms = 7;
+    $ms = 0;
   elseif($image_id == 23)
     $ms = 2;
   elseif($image_id == 24)
-    $ms = 0;
+    $ms = 3;
   elseif($image_id == 25)
-    $ms = 1;
+    $ms = 2;
   elseif($image_id == 26)
     $ms = 0;
   elseif($image_id == 27)
-    $ms = 0;
+    $ms = 3;
   elseif($image_id == 28)
-    $ms = 4;
+    $ms = 0;
   elseif($image_id == 29)
-    $ms = 8;
+    $ms = 3;
   elseif($image_id == 30)
-    $ms = 7;
+    $ms = 2;
   elseif($image_id == 31)
-    $ms = 2;
+    $ms = 3;
   elseif($image_id == 32)
-    $ms = 6;
+    $ms = 3;
   elseif($image_id == 33)
-    $ms = 2;
+    $ms = 3;
   elseif($image_id == 34)
-    $ms = 7;
+    $ms = 0;
   elseif($image_id == 35)
-    $ms = 2;
+    $ms = 4;
   elseif($image_id == 36)
     $ms = 0;
   elseif($image_id == 37)
-    $ms = 0;
+    $ms = 2;
   elseif($image_id == 38)
-    $ms = 6;
+    $ms = 4;
   elseif($image_id == 39)
     $ms = 0;
   elseif($image_id == 40)
-    $ms = 6;
+    $ms = 0;
   elseif($image_id == 41)
-    $ms = 7;
+    $ms = 0;
   elseif($image_id == 42)
-    $ms = 6;
-  elseif($image_id == 43)
-    $ms = 3;
-  elseif($image_id == 44)
-    $ms = 7;
-  elseif($image_id == 45)
     $ms = 1;
+  elseif($image_id == 43)
+    $ms = 4;
+  elseif($image_id == 44)
+    $ms = 4;
+  elseif($image_id == 45)
+    $ms = 3;
   elseif($image_id == 46)
     $ms = 2;
   elseif($image_id == 47)
-    $ms = 9;
+    $ms = 0;
   elseif($image_id == 48)
-    $ms = 10;
+    $ms = 2;
   elseif($image_id == 49)
-    $ms = 10;
+    $ms = 3;
+  elseif($image_id == 50)
+    $ms = 4;
+  elseif($image_id == 51)
+    $ms = 0;
+  elseif($image_id == 52)
+    $ms = 0;
+  elseif($image_id == 53)
+    $ms = 0;
+  elseif($image_id == 54)
+    $ms = 3;
+  elseif($image_id == 55)
+    $ms = 1;
+  elseif($image_id == 56)
+    $ms = 4;
+  elseif($image_id == 57)
+    $ms = 2;
+  elseif($image_id == 58)
+    $ms = 3;
+  elseif($image_id == 59)
+    $ms = 0;
+  elseif($image_id == 60)
+    $ms = 3;
+  elseif($image_id == 61)
+    $ms = 0;
+  elseif($image_id == 62)
+    $ms = 1;
+  elseif($image_id == 63)
+    $ms = 1;
+  elseif($image_id == 64)
+    $ms = 1;
+  elseif($image_id == 65)
+    $ms = 1;
+  elseif($image_id == 66)
+    $ms = 4;
+  elseif($image_id == 67)
+    $ms = 4;
+  elseif($image_id == 68)
+    $ms = 4;
   else
-    $ms = rand(0,10);
+    $ms = rand(0,4);
 
-  usleep( $ms * 100 * 1000 );
+  usleep( $ms * 400 * 1000 );
 
   if($image_id < 0)
     $image_id = 0;

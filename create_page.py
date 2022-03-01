@@ -1,6 +1,5 @@
 import os, os.path, sys, argparse
-
-images_per_char = 2
+import globals
 
 def generate_HTML(num):
     #HTML file
@@ -20,20 +19,6 @@ def generate_HTML(num):
     f.close()
 
 
-def dec_to_base(num, base):  #Maximum base - 36
-    base_num = ""
-    while num>0:
-        dig = int(num%base)
-        if dig<10:
-            base_num += str(dig)
-        else:
-            base_num += chr(ord('A')+dig-10)  #Using uppercase letters
-        num //= base
-
-    base_num = base_num[::-1]  #To reverse the string
-    return base_num
-
-
 def generate_PHP(msg):
     #PHP file
 
@@ -43,26 +28,24 @@ def generate_PHP(msg):
     # Write the header of image.php and get the value of "image_id" from the URL
     f.write('<?php\n  header("Content-Type:image/png");\n\n  $image_id = $_GET["image_id"];\n\n')
 
-    # If it is the images before the message itself, have a delay of 10
-    f.write('  if($image_id == 0)\n    $ms = 10;\n')
-    f.write('  if($image_id == 1)\n    $ms = 10;\n')
-
-    base = 11
+    # If it is the images before the message itself, have a maximum delay
+    for j in range (0, globals.images_per_char):
+        f.write('  if($image_id == ' + str(j) + ')\n    $ms = ' + str(globals.base-1) + ';\n')
 
     # For each character of the message, specify the delay of the corresponding images using the ascii value of the character itslef
-    for i in range (images_per_char, (len(msg)+images_per_char)):
-        f.write('  elseif($image_id == ' + str(2*i - 2) + ')\n    $ms = ' + str(int(dec_to_base((ord(msg[i-images_per_char])-32), base).rjust(2, '0')[0], base)) + ';\n')
-        f.write('  elseif($image_id == ' + str(2*i - 1) + ')\n    $ms = ' + str(int(dec_to_base((ord(msg[i-images_per_char])-32), base).rjust(2, '0')[1], base)) + ';\n')
+    for i in range (globals.images_per_char, (len(msg)+globals.images_per_char)):
+        for j in range (0, globals.images_per_char):
+            f.write('  elseif($image_id == ' + str(i+j+(i-globals.images_per_char)*(globals.images_per_char-1)) + ')\n    $ms = ' + str(int(globals.dec_to_base((ord(msg[i-globals.images_per_char])-32), globals.base).rjust(globals.images_per_char, '0')[j], globals.base)) + ';\n')
 
-    # If it is the images after the message itself, have a delay of 10
-    f.write('  elseif($image_id == ' + str((len(msg)+1) * images_per_char) + ')\n    $ms = 10;\n')
-    f.write('  elseif($image_id == ' + str((len(msg)+1) * images_per_char+1) + ')\n    $ms = 10;\n')
+    # If it is the images after the message itself, have a maximum delay
+    for j in range ((len(msg)+1) * globals.images_per_char, (len(msg)+2) * globals.images_per_char):
+        f.write('  elseif($image_id == ' + str(j) + ')\n    $ms = ' + str(globals.base-1) + ';\n')
 
     # If it is any additional image, have a random delay
-    f.write('  else\n    $ms = rand(0,10);\n\n')
+    f.write('  else\n    $ms = rand(0,' + str(globals.base-1) + ');\n\n')
 
-    # Sleep as many milliseconds as specified; usleep is specified by microseconds, so multiply by 1000; also multiply by 100 to have more delay, making it more robust
-    f.write('  usleep( $ms * 100 * 1000 );\n\n')
+    # Sleep as many milliseconds as specified; usleep is specified by microseconds, so multiply by 1000; also multiply by inter_delay to have more delay, making it more robust
+    f.write('  usleep( $ms * ' + str(globals.inter_delay) + ' * 1000 );\n\n')
 
     # Check how many images there are under the "img" directory
     img_dir = './img'
@@ -77,6 +60,9 @@ def generate_PHP(msg):
 
 
 if __name__ == '__main__':
+    # Define global variables
+    globals.init_globals()
+
     # Parse the arguments passed to the program
     parser = argparse.ArgumentParser(description='Generate the Stego page')
     parser.add_argument('-msg', type=str, required=True, help='the message to hide')
@@ -87,8 +73,8 @@ if __name__ == '__main__':
     num = args.num
 
     if (num <= 0):
-        num = (len(msg) + 2) * images_per_char
-    if (((len(msg) + 2) * images_per_char) > num):
+        num = (len(msg) + 2) * globals.images_per_char
+    if (((len(msg) + 2) * globals.images_per_char) > num):
         print('Error: the message cannot be bigger than the number of images')
     else:
         generate_HTML(num)
