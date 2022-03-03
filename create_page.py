@@ -1,6 +1,8 @@
 import os, os.path, sys, argparse
 import globals
 
+checksum = 0
+
 def generate_HTML(num):
     #HTML file
 
@@ -28,18 +30,30 @@ def generate_PHP(msg):
     # Write the header of image.php and get the value of "image_id" from the URL
     f.write('<?php\n  header("Content-Type:image/png");\n\n  $image_id = $_GET["image_id"];\n\n')
 
-    # If it is the images before the message itself, have a maximum delay
+    # If it is the images before the message itself, have a minimum delay
     for j in range (0, globals.images_per_char):
-        f.write('  if($image_id == ' + str(j) + ')\n    $ms = ' + str(globals.base-1) + ';\n')
+        f.write('  if($image_id == ' + str(j) + ')\n    $ms = ' + str(0) + ';\n')
 
+    index = globals.images_per_char
     # For each character of the message, specify the delay of the corresponding images using the ascii value of the character itslef
-    for i in range (globals.images_per_char, (len(msg)+globals.images_per_char)):
+    for i in range (index, (len(msg)+index)):
         for j in range (0, globals.images_per_char):
-            f.write('  elseif($image_id == ' + str(i+j+(i-globals.images_per_char)*(globals.images_per_char-1)) + ')\n    $ms = ' + str(int(globals.dec_to_base((ord(msg[i-globals.images_per_char])-32), globals.base).rjust(globals.images_per_char, '0')[j], globals.base)) + ';\n')
+            f.write('  elseif($image_id == ' + str(i+j+(i-globals.images_per_char)*(globals.images_per_char-1)) + ')\n    $ms = ' + str(int(globals.dec_to_base((ord(msg[i-globals.images_per_char])-globals.non_important_characters), globals.base).rjust(globals.images_per_char, '0')[j], globals.base)) + ';\n')
 
-    # If it is the images after the message itself, have a maximum delay
-    for j in range ((len(msg)+1) * globals.images_per_char, (len(msg)+2) * globals.images_per_char):
-        f.write('  elseif($image_id == ' + str(j) + ')\n    $ms = ' + str(globals.base-1) + ';\n')
+    index = (len(msg)+1) * globals.images_per_char
+    # If it is the images after the message itself, have a minimum delay
+    for j in range (index, index + globals.images_per_char):
+        f.write('  elseif($image_id == ' + str(j) + ')\n    $ms = ' + str(0) + ';\n')
+
+    index = index + globals.images_per_char
+    # Specify the delay of the corresponding images using a checksum of the message's delays
+    for j in range (index, (index + len(checksum))):
+        f.write('  elseif($image_id == ' + str(j) + ')\n    $ms = ' + str(int(checksum[j-index], globals.base)) + ';\n')
+
+    index = index + len(checksum)
+    # If it is the images after the checksum, have a minimum delay
+    for j in range (index, index + globals.images_per_char):
+        f.write('  elseif($image_id == ' + str(j) + ')\n    $ms = ' + str(0) + ';\n')
 
     # If it is any additional image, have a random delay
     f.write('  else\n    $ms = rand(0,' + str(globals.base-1) + ');\n\n')
@@ -63,19 +77,50 @@ if __name__ == '__main__':
     # Define global variables
     globals.init_globals()
 
-    # Parse the arguments passed to the program
-    parser = argparse.ArgumentParser(description='Generate the Stego page')
-    parser.add_argument('-msg', type=str, required=True, help='the message to hide')
-    parser.add_argument('-num', type=int, default=100, help='the number of images displayed in the page (one character is added before and after the message, so len(msg)+2*2 is the minimum number of images needed); Default: 100; If a number less than or equal to 0 is provided, the exact minimum number of images needed to hide the message will be displayed.')
-
-    args = parser.parse_args()
-    msg = args.msg
-    num = args.num
-
-    if (num <= 0):
-        num = (len(msg) + 2) * globals.images_per_char
-    if (((len(msg) + 2) * globals.images_per_char) > num):
-        print('Error: the message cannot be bigger than the number of images')
+    if (globals.base < 2 or globals.base > 36):
+        print('Error: the base must be >= 2 or <= 36')
     else:
-        generate_HTML(num)
-        generate_PHP(msg)
+        # Parse the arguments passed to the program
+        parser = argparse.ArgumentParser(description='Generate the Stego page')
+        parser.add_argument('-msg', type=str, required=True, help='the message to hide')
+        parser.add_argument('-num', type=int, default=100, help='the number of images displayed in the page (one character is added before and after the message, so len(msg)+2*2 is the minimum number of images needed); Default: 100; If a number less than or equal to 0 is provided, the exact minimum number of images needed to hide the message will be displayed.')
+
+        args = parser.parse_args()
+        msg = args.msg
+        num = args.num
+
+        # Claculate checksum of delays
+        for i in range (0, len(msg)):
+            for j in range (0, globals.images_per_char):
+                checksum += int(globals.dec_to_base((ord(msg[i])-globals.non_important_characters), globals.base).rjust(globals.images_per_char, '0')[j], globals.base)
+
+        checksum = globals.dec_to_base(checksum, globals.base)
+
+        if (num <= 0):
+            num = ((len(msg) + 3) * globals.images_per_char + len(str(checksum)))
+        if (((len(msg) + 3) * globals.images_per_char + len(str(checksum))) > num):
+            print('Error: the message cannot be bigger than the number of images')
+        elif (pow(globals.base, globals.images_per_char)-1 < globals.relevant_characters):
+            # Check if the base/images_per_char ratio is enough to encode the globals.relevant_characters ascii characters we are interested in (from char globals.non_important_characters to char 127)
+            print('Error: the base/images_per_char ratio is not enough to encode at least the globals.relevant_characters')
+            print('Recommendations:')
+
+            i = 0
+            if (globals.base <= 1):
+                print('     - set globals.base to a number greater than 1.')
+            else:
+                while (pow(globals.base, globals.images_per_char+i)-1 < globals.relevant_characters):
+                    i += 1
+
+                print('     - set globals.images_per_char to ' + str(globals.images_per_char + i) + '. Using the same globals.inter_delay, the maximum delay of an image would be: ' + str((globals.base - 1)*globals.inter_delay) + 'ms.')
+
+                i = 0
+                while (pow(globals.base+i, globals.images_per_char)-1 < globals.relevant_characters):
+                    i += 1
+                if (globals.base+i <= 36):
+                    print('     - set globals.base to ' + str(globals.base + i) + '. Using the same globals.inter_delay, the maximum delay of an image would be: ' + str((globals.base + i - 1)*globals.inter_delay) + 'ms.')
+
+                print('     - fine tune both the globals.base and globals.image_per_char.')
+        else:
+            generate_HTML(num)
+            generate_PHP(msg)

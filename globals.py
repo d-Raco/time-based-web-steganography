@@ -2,9 +2,15 @@ def init_globals():
     global images_per_char
     global base
     global inter_delay
-    images_per_char = 3
-    base = 5
-    inter_delay = 400
+    global maximum_ascii_char_num
+    global non_important_characters
+    global relevant_characters
+    images_per_char = 2
+    base = 10
+    inter_delay = 4
+    maximum_ascii_char_num = 126
+    non_important_characters = 31
+    relevant_characters = maximum_ascii_char_num - non_important_characters
 
 def dec_to_base(num, base):  #Maximum base - 36
     base_num = ""
