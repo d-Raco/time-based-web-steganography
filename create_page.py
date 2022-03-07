@@ -1,4 +1,4 @@
-import os, os.path, sys, argparse
+import os, os.path, sys, argparse, math
 import globals
 
 def generate_HTML(num):
@@ -28,26 +28,40 @@ def generate_PHP(msg):
     # Write the header of image.php and get the value of "image_id" from the URL
     f.write('<?php\n  header("Content-Type:image/png");\n\n  $image_id = $_GET["image_id"];\n\n')
 
-    index = 0
-    # For each character of the message, specify the delay of the corresponding images using the ascii value of the character itslef converted into the specified base
-    for i in range (index, (len(msg)+index)):
-        for j in range (0, globals.images_per_char):
-            if (i == 0 and j == 0):
-                f.write('  if($image_id == ' + str(i*(globals.images_per_char) + j) + ')\n    $ms = ' + str(int(globals.dec_to_base((ord(msg[i])-globals.non_important_characters), globals.base).rjust(globals.images_per_char, '0')[j], globals.base)) + ';\n')
-            else:
-                f.write('  elseif($image_id == ' + str(i*(globals.images_per_char) + j) + ')\n    $ms = ' + str(int(globals.dec_to_base((ord(msg[i])-globals.non_important_characters), globals.base).rjust(globals.images_per_char, '0')[j], globals.base)) + ';\n')
+    checksum_length = 0
+    # Divide the message into blocks
+    for block in range (0, block_number):
+        index = (block * globals.block_size + 2*block) * globals.images_per_char + checksum_length
+        # For each character of the message, specify the delay of the corresponding images using the ascii value of the character itslef converted into the specified base
+        for i in range (0, globals.block_size):
+            msg_index = i + block*globals.block_size
+            # Check if the index does not exceed the message
+            if (msg_index < len(msg)):
+                # Divide each character into the number of images needed per char
+                for j in range (0, globals.images_per_char):
+                    if (block == 0 and i == 0 and j == 0):
+                        f.write('  if($image_id == ' + str(index) + ')\n    $ms = ' + str(int(globals.dec_to_base((ord(msg[msg_index])-globals.non_important_characters), globals.base).rjust(globals.images_per_char, '0')[j], globals.base)) + ';\n')
+                    else:
+                        f.write('  elseif($image_id == ' + str(index) + ')\n    $ms = ' + str(int(globals.dec_to_base((ord(msg[msg_index])-globals.non_important_characters), globals.base).rjust(globals.images_per_char, '0')[j], globals.base)) + ';\n')
+                    index += 1
 
-    index = len(msg) * globals.images_per_char
-    # Add a separator between the message itself and the checksum; it will be identified by having the minimum delay
-    for j in range (index, index + globals.images_per_char):
-        f.write('  elseif($image_id == ' + str(j) + ')\n    $ms = ' + str(0) + ';\n')
+        # Add a separator between the message itself and the checksum; it will be identified by having the minimum delay
+        for j in range (index, index + globals.images_per_char):
+            f.write('  elseif($image_id == ' + str(j) + ')\n    $ms = ' + str(0) + ';\n')
+
+        index = index + globals.images_per_char
+        checksum = checksum_list.pop()
+        checksum_length += len(checksum)
+        # Specify the delay of the corresponding images using a checksum, which is calculated by adding all the message's delays
+        for j in range (index, (index + len(checksum))):
+            f.write('  elseif($image_id == ' + str(j) + ')\n    $ms = ' + str(int(checksum[j-index], globals.base)) + ';\n')
+
+        index = index + len(checksum)
+        # Add a separator between the checksum and the rest of the message; it will be identified by having the minimum delay
+        for j in range (index, index + globals.images_per_char):
+            f.write('  elseif($image_id == ' + str(j) + ')\n    $ms = ' + str(0) + ';\n')
 
     index = index + globals.images_per_char
-    # Specify the delay of the corresponding images using a checksum, which is calculated by adding all the message's delays
-    for j in range (index, (index + len(checksum))):
-        f.write('  elseif($image_id == ' + str(j) + ')\n    $ms = ' + str(int(checksum[j-index], globals.base)) + ';\n')
-
-    index = index + len(checksum)
     # Add a separator between the checksum and the rest of coverup additional images; it will be identified by having the minimum delay
     for j in range (index, index + globals.images_per_char):
         f.write('  elseif($image_id == ' + str(j) + ')\n    $ms = ' + str(0) + ';\n')
@@ -79,29 +93,48 @@ def main():
         print('Error: the base must be >= 2 or <= 36')
         return
 
+    # Check if the globals.block_size is a valid number
+    if (globals.block_size < 1):
+        print('Error: the block_size must be >= 1')
+        return
+
     # Parse the arguments passed to the program
     parser = argparse.ArgumentParser(description='Generate the Stego page')
     parser.add_argument('-msg', type=str, required=True, help='the message to hide')
-    parser.add_argument('-num', type=int, default=300, help='the number of images displayed in the page (one character is added before and after the message, so len(msg)+2*2 is the minimum number of images needed); Default: 100; If a number less than or equal to 0 is provided, the exact minimum number of images needed to hide the message will be displayed.')
+    parser.add_argument('-num', type=int, default=300, help='the number of images displayed in the page (consider that space is needed for the checksum and separators); Default: 100; If a number less than or equal to 0 is provided, the exact minimum number of images needed to hide the message will be displayed.')
 
     args = parser.parse_args()
     msg = args.msg
     num = args.num
 
-    global checksum
-    checksum = 0
-    # Calculate the checksum of the different delays, adding the corresponding numbers and transforming the result into the specified base
-    for i in range (0, len(msg)):
-        for j in range (0, globals.images_per_char):
-            checksum += int(globals.dec_to_base((ord(msg[i])-globals.non_important_characters), globals.base).rjust(globals.images_per_char, '0')[j], globals.base)
-    checksum = globals.dec_to_base(checksum, globals.base)
+    global block_number
+    block_number = math.ceil(len(msg) / globals.block_size)
 
-    # If number lower or equal to 0, specify the number of images as the minimum required to hide the message (taking into consideration the checksum and separators)
+    global checksum_list
+    checksum_list = []
+    checksum_size = 0
+    # Calculate the checksum of the different delays by block, adding the corresponding numbers and transforming the result into the specified base
+    for block in range (0, block_number):
+        checksum = 0
+        index = block * globals.block_size
+        for i in range (index, (index+globals.block_size)):
+            # Check if the index does not exceed the message
+            if (i < len(msg)):
+                for j in range (0, globals.images_per_char):
+                    checksum += int(globals.dec_to_base((ord(msg[i])-globals.non_important_characters), globals.base).rjust(globals.images_per_char, '0')[j], globals.base)
+        checksum = globals.dec_to_base(checksum, globals.base)
+        checksum_size += len(checksum)
+        checksum_list.insert(0, checksum)
+
+    # Minimum number of images required to hide the message (taking into consideration the checksums and separators)
+    minimum = ((len(msg) + 2*block_number + 1) * globals.images_per_char + checksum_size)
+
+    # If number lower or equal to 0, specify the number of images as the minimum required to hide the message
     if (num <= 0):
-        num = ((len(msg) + 2) * globals.images_per_char + len(str(checksum)))
+        num = minimum
 
     # Check if the number of images is not enough to hide the message
-    if (((len(msg) + 2) * globals.images_per_char + len(str(checksum))) > num):
+    if (minimum > num):
         print('Error: the message cannot be bigger than the number of images')
         return
 

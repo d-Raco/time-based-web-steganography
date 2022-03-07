@@ -25,34 +25,44 @@ else:
     soup = BeautifulSoup(r.text, 'html.parser')
 
     # Initialize variables
-    success = False
     retry = True
+    end = False
     char_list = []
     minimum_delay = ""
+    block_position = 0
+    last_item = 0
+    counter = 0
+    tmp_msg = []
+    resulting_msg = []
 
     # Claculate the minimum delay used to identify the separators between the message, the checksum and the rest of coverup additional images
     for x in range(0, globals.images_per_char):
         minimum_delay += '0'
 
-    while retry:
+    while not end:
         # Initialize variables
         retry = False
         msg = True
         check = False
         checksum = 0
         index = 0
+        counter = block_position
         msg_delay = ""
 
-        # Delete any elements present in the list
+        # Delete any elements present in the lists
         while char_list:
             char_list.pop()
+
+        while tmp_msg:
+            tmp_msg.pop()
 
         # Iterate all <img> HTML elements
         for item in soup.find_all('img'):
             if retry:
                 # Checksum did not match, begin all the process once again
                 break
-            else:
+            elif (int(item['id']) >= last_item):
+                # Focus only on the specific block
                 if (msg or check):
                     # If it is part of the message or checksum, get the image
                     r = requests.get(webpage + item['src'])
@@ -66,7 +76,6 @@ else:
 
                     # Enter when the delays of a single character of the message have been gathered
                     if (msg and (index % globals.images_per_char == 0)):
-                        index = 0
                         msg_delay = ""
 
                         # Concatenate all the delays of the specific character of the message and calculate the checksum at the same time
@@ -76,8 +85,13 @@ else:
                                 msg_delay += img_delay
                                 checksum += int(img_delay, globals.base)
 
+                        # Check if it is the end of the whole message
+                        if (counter == block_position and msg_delay == minimum_delay):
+                            end = True
+                            break
+
                         # Check if it is the end of the message (the character is a separator; minimum delay)
-                        if (msg_delay == minimum_delay):
+                        elif (msg_delay == minimum_delay):
                             # End of the message
                             msg = False
 
@@ -85,11 +99,21 @@ else:
                             check = True
                             msg_delay = ""
 
+                            # Print the message obtained so far
+                            for i in resulting_msg:
+                                print(i, end="")
+                            for i in tmp_msg:
+                                print(i, end="")
+                            print()
+
                             # Translate the checksum from decimal into the specified base
                             checksum = globals.dec_to_base(checksum, globals.base)
-                            print()
                         else:
-                            print(chr(int(msg_delay, globals.base) + globals.non_important_characters), end="")
+                            # Store the character obtained
+                            tmp_msg.append(chr(int(msg_delay, globals.base) + globals.non_important_characters))
+
+                        index = 0
+                        counter += 1
 
                     # Check if the sent checksum is the same as the one calculated
                     elif (check):
@@ -104,16 +128,38 @@ else:
                             # Check if the calculated checksum and the received one are the same
                             if (checksum == msg_delay):
                                 # Checksum matched
-                                success = True
                                 print('Checksum matched')
-                                break
+
+                                # Store the message
+                                for i in tmp_msg:
+                                    resulting_msg.append(i)
+
+                                while tmp_msg:
+                                    tmp_msg.pop()
+
+                                # Update the block position
+                                block_position += globals.block_size
+                                counter = block_position
+                                last_item = int(item['id'])+1
+
+                                index = 0
+                                checksum = 0
+                                msg = True
+                                check = False
                             else:
                                 # Checksum did not match, begin the whole process again
                                 retry = True
                         elif (len(msg_delay[:-globals.images_per_char]) > len(str(checksum))):
                             # The checksum received is longer than the calculated checksum, something went wrong. Begin the whole process again
                             retry = True
-        if not success:
+        if not end:
             # Checksum did not match, begin the whole process again
             print('Error: Checksum did not match')
             retry = True
+
+    # Print result
+    print()
+    print('Hidden message:')
+    for i in resulting_msg:
+        print(i, end="")
+    print()

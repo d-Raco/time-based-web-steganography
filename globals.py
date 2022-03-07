@@ -3,15 +3,19 @@ def init_globals():
 
     # Number of images that encode a single character
     global images_per_char
-    images_per_char = 3
+    images_per_char = 2
 
     # Numerical based used per image-delay (number of possible symbols that the delay of a single image can encode)
     global base
-    base = 5
+    base = 10
 
     # Delay between symbols, in milliseconds
     global inter_delay
-    inter_delay = 80
+    inter_delay = 5
+
+    # Number of characters present in a single block. The message will be divided in blocks and a checksum will be performed over each block.
+    global block_size
+    block_size = 7
 
     # Maximum value of the alphabet that is going to be used (i.e., number of the ascii character with the highest decimal value from all the possible ascii characters that are going to be used in the message)
     global maximum_ascii_char_num
@@ -24,6 +28,7 @@ def init_globals():
     # Length of the alphabet used
     global relevant_characters
     relevant_characters = maximum_ascii_char_num - non_important_characters
+
 
 def dec_to_base(num, base):
     ''' Transforms an integer number into any base smaller than or equal to 36'''
