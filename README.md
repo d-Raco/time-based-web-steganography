@@ -103,15 +103,23 @@ optional arguments:
               will be displayed.
 ```
 
-Some checks are performed over the arguments passed and the global variable to make sure that no errors are encountered during the execution. It may be the case that there are required python libraries that are not installed on the system. To install them, execute the command pip install <library>. If pip is not installed on the system, first execute python3 -m pip install.
+Some checks are performed over the arguments passed and the global variable to make sure that no errors are encountered during the execution. It may be the case that there are required python libraries that are not installed on the system. To install them, execute the command:
+```
+pip install <library>
+```
 
-After executing the create_page.py script, the web server must be started. This is done by executing the XAMPP application and starting the Apache Web Server functionality. If everything worked properly, the web page should be visible by opening a web browser and typing the following URL: http://localhost/<name of the code folder>/.
+If pip is not installed on the system, first execute 
+```
+python3 -m pip install
+```
+
+After executing the create_page.py script, the web server must be started. This is done by executing the XAMPP application and starting the Apache Web Server functionality. If everything worked properly, the web page should be visible by opening a web browser and typing the following URL: http://localhost/name_of_the_code_folder/.
 
 Now the script unhide.py must be edited. The webpage value must be changed to the URL inputted into the browser. Lastly, this script can be executed.
 
-This has been executed locally. In order to execute over a network first download the unhide.py and globals.py files onto another device and change the web page to http://<internal ip of the server>/<name of the code folder>/. Both devices must be connected to the same network.
+This has been executed locally. In order to execute over a network first download the unhide.py and globals.py files onto another device and change the web page to http://internal_ip_of_the_server/name_of_the_code_folder/. Both devices must be connected to the same network.
 
-In order to use it over the network, the configuration of the router must be changed in order to forward incoming traffic to the server. Open a web browser and type http://192.168.1.1. Under the Ports menu add a new rule with the server’s IP address, TCP protocol, set the external port to 5555, for example, and internal port to 80. Now, an external system can access the website by setting the web page value to http://<external ip of the server>:<external port set in the router rule>/<name of the code folder>.
+In order to use it over the network, the configuration of the router must be changed in order to forward incoming traffic to the server. Open a web browser and type http://192.168.1.1. Under the Ports menu add a new rule with the server’s IP address, TCP protocol, set the external port to 5555, for example, and internal port to 80. Now, an external system can access the website by setting the web page value to http://external_ip_of_the_server:external_port_set_in_the_router_rule/name_of_the_code_folder/.
 
 ## Comprehensive tests
 
