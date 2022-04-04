@@ -1,5 +1,7 @@
+<p align="center"><a href="https://github.com/Rymond3/time-based-web-steganography"><img width="80%" src="assets/tbws.png" /></a></p>
+
 # time-based-web-steganography
- A steganography method for hiding messages in image delivery latency
+A steganography method for hiding messages in image delivery latency
 
 ## Introduction
 Steganography consists of the use of techniques that make it possible to hide a message so that its mere existence is not perceived. This data is embedded into normal-looking information (called cover) so the secret is only revealed if using suitable mechanisms.
