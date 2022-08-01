@@ -95,7 +95,7 @@ unhide.py: This python script connects to the web page and extracts the message 
 ## Setup & Usage
 To test the PoC, the first step is to set up a web server. This can be achieved through a web server solution. One possibility is XAMPP, which is open source and cross-platform; it can be downloaded from [this site](https://www.apachefriends.org/download.html).
 
-After the installation, the code of the PoC must be copied into the htdocs folder, located inside XAMPP’s directory. A new folder must be created inside of the htdocs folder, and the code must be copied inside. The PoC code can be obtained from [this public repository](https://github.com/Rymond3/time-based-web-steganography).
+After the installation, the code of the PoC must be copied into the htdocs folder, located inside XAMPP’s directory. A new folder must be created inside of the htdocs folder, and the code must be copied inside. The PoC code can be obtained from [this public repository](https://github.com/d-Raco/time-based-web-steganography).
 
 Now, the webpage must be created. Python is needed to execute the PoC, so it must be installed; it can be downloaded from [this site](https://www.python.org/downloads/). Firstly, the globals.py file can be edited to set global variables like inter-delay, number of images used to encode a single character, etc. Then, a terminal must be opened inside of the directory containing the code and the create_page.py must be executed. The arguments of this script are:
 
