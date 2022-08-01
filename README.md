@@ -1,11 +1,11 @@
-<p align="center"><a href="https://github.com/Rymond3/time-based-web-steganography"><img width="80%" src="assets/tbws.png" /></a></p>
+<p align="center"><a href="https://github.com/d-Raco/time-based-web-steganography"><img width="80%" src="assets/tbws.png" /></a></p>
 
 <p align="center">
-  <a href="#"><img alt="License" src="https://img.shields.io/github/license/Rymond3/time-based-web-steganography"></a>
+  <a href="#"><img alt="License" src="https://img.shields.io/github/license/d-Raco/time-based-web-steganography"></a>
   <a href="#"><img alt="Platform" src="https://shields.io/badge/platform-ios%20|%20linux%20|%20windows-%23989898"></a>
-  <a href="#"><img alt="Last commit" src="https://shields.io/github/last-commit/Rymond3/time-based-web-steganography"></a>
-  <a href="#"><img alt="Repo stars" src="https://img.shields.io/github/stars/Rymond3/time-based-web-steganography"></a>
-  <a href="#"><img alt="Repo stars" src="https://img.shields.io/github/watchers/Rymond3/time-based-web-steganography"></a>
+  <a href="#"><img alt="Last commit" src="https://shields.io/github/last-commit/d-Raco/time-based-web-steganography"></a>
+  <a href="#"><img alt="Repo stars" src="https://img.shields.io/github/stars/d-Raco/time-based-web-steganography"></a>
+  <a href="#"><img alt="Repo stars" src="https://img.shields.io/github/watchers/d-Raco/time-based-web-steganography"></a>
 </p>
 
 # time-based-web-steganography
